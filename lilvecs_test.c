@@ -1,24 +1,121 @@
 #include "lilvecs.h"
+#include <assert.h>
 #include <stdio.h>
 
-VEC_DECL(int)
+typedef struct Point {
+  char* label;
+  float x;
+  float y;
+} Point;
 
-void print_int(int item, uint32_t i) {
-  printf("index %d: %d\n", i, item);
+VEC_DECL(int)
+VEC_DECL(Point)
+
+void test_create() {
+  Vec_int* vi = vec_create_int();
+  assert(vi);
+  assert(&*(char*)vi);
+
+  Vec_Point* vp = vec_create_Point();
+  assert(vp);
+  assert(&*(char*)vp);
+}
+
+void test_delete() {
+  Vec_int* vi = vec_create_int();
+  vec_delete_int(vi);
+  assert(vec_data_int(vi) == NULL);  // undefined
+
+  Vec_Point* vp = vec_create_Point();
+  vec_delete_Point(vp);
+  assert(vec_data_Point(vp) == NULL);  // undefined
+}
+
+void test_grow() {
+  Vec_int* vi = vec_create_int();
+  assert(vec_capacity_int(vi) == 0);
+  vec_grow_int(vi, 10);
+  assert(vec_capacity_int(vi) >= 10);
+  vec_delete_int(vi);
+
+  Vec_Point* vp = vec_create_Point();
+  assert(vec_capacity_Point(vp) == 0);
+  vec_grow_Point(vp, 10);
+  assert(vec_capacity_Point(vp) >= 10);
+  vec_delete_Point(vp);
+}
+
+void test_push() {
+  Vec_int* vi = vec_create_int();
+  assert(vec_size_int(vi) == 0);
+  vec_push_int(vi, 10);
+  assert(vec_size_int(vi) == 1);
+  vec_push_int(vi, 20);
+  assert(vec_size_int(vi) == 2);
+  assert(vec_get_int(vi, 1) == 20);
+  vec_delete_int(vi);
+
+  Vec_Point* vp = vec_create_Point();
+  assert(vec_size_Point(vp) == 0);
+  vec_push_Point(vp, (Point){
+    .label="spot",
+    .x=420.0,
+    .y=69.0
+  });
+  assert(vec_size_Point(vp) == 1);
+  vec_push_Point(vp, (Point){
+    .label="point",
+    .x=1337.0,
+    .y=42.0
+  });
+  assert(vec_size_Point(vp) == 2);
+  assert(vec_get_Point(vp, 1).x == 1337.0);
+  vec_delete_Point(vp);
+}
+
+void test_pop() {
+  Vec_int* vi = vec_create_int();
+  vec_push_int(vi, 10);
+  vec_push_int(vi, 20);
+  vec_push_int(vi, 30);
+  assert(vec_size_int(vi) == 3);
+  assert(vec_pop_int(vi) == 30);
+  assert(vec_size_int(vi) == 2);
+  assert(vec_pop_int(vi) == 20);
+  assert(vec_size_int(vi) == 1);
+  assert(vec_pop_int(vi) == 10);
+  assert(vec_size_int(vi) == 0);
+  vec_delete_int(vi);
+}
+
+void test_set() {
+  Vec_int* vi = vec_create_int();
+  vec_push_int(vi, 10);
+  vec_push_int(vi, 20);
+  vec_push_int(vi, 30);
+
+  vec_set_int(vi, 1, 40);
+  assert(vec_get_int(vi, 0) == 10);
+  assert(vec_get_int(vi, 1) == 40);
+  assert(vec_get_int(vi, 2) == 30);
+  vec_delete_int(vi);
 }
 
 int main(int argc, char const* argv[]) {
-  Vec_int* v = vec_create_int();
-
-  for (int i = 0; i < 100; ++i) {
-    vec_push_int(v, i);
-  }
-
-  vec_foreach_int(v, print_int);
-  printf("vec capacity: %d\n", vec_capacity_int(v));
-
-  vec_delete_int(v);
+  printf("test_create\n");
+  test_create();
+  printf("test_delete\n");
+  test_delete();
+  printf("test_grow\n");
+  test_grow();
+  printf("test_push\n");
+  test_push();
+  printf("test_pop\n");
+  test_pop();
+  printf("test_set\n");
+  test_set();
   return 0;
 }
 
 VEC_IMPL(int)
+VEC_IMPL(Point)
