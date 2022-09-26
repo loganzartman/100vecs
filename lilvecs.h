@@ -21,10 +21,13 @@
 #define ITEM_REF(item) &(item)
 #endif
 
+#define VEC_CLEANUP(T) __attribute__((__cleanup__(vec_cleanup_##T)))
+
 #define VEC_DECL(T)                                                   \
   typedef struct Vec_##T Vec_##T;                                     \
   extern Vec_##T* vec_create_##T();                                   \
   extern void vec_delete_##T(Vec_##T* v);                             \
+  extern void vec_cleanup_##T(Vec_##T** v);                           \
   extern uint32_t vec_size_##T(Vec_##T* v);                           \
   extern uint32_t vec_capacity_##T(Vec_##T* v);                       \
   extern T* vec_data_##T(Vec_##T* v);                                 \
@@ -58,6 +61,10 @@
       v->data = NULL;                                                 \
     }                                                                 \
     free(v);                                                          \
+  }                                                                   \
+                                                                      \
+  void vec_cleanup_##T(Vec_##T** v) {                                 \
+    vec_delete_##T(*v);                                               \
   }                                                                   \
                                                                       \
   uint32_t vec_size_##T(Vec_##T* v) {                                 \

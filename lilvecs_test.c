@@ -101,6 +101,17 @@ void test_set() {
   vec_delete_int(vi);
 }
 
+void test_cleanup() {
+  Vec_int* bookmark = NULL;
+  {
+    Vec_int* v VEC_CLEANUP(int) = vec_create_int();
+    vec_push_int(v, 10);
+    bookmark = v;
+    assert(vec_data_int(bookmark));
+  }
+  assert(vec_data_int(bookmark) == NULL);
+}
+
 int main(int argc, char const* argv[]) {
   printf("test_create\n");
   test_create();
@@ -114,6 +125,9 @@ int main(int argc, char const* argv[]) {
   test_pop();
   printf("test_set\n");
   test_set();
+  printf("test_cleanup\n");
+  test_cleanup();
+
   return 0;
 }
 
