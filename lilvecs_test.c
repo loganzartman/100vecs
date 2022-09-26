@@ -24,11 +24,9 @@ void test_create() {
 void test_delete() {
   Vec_int* vi = vec_create_int();
   vec_delete_int(vi);
-  assert(vec_data_int(vi) == NULL);  // undefined
 
   Vec_Point* vp = vec_create_Point();
   vec_delete_Point(vp);
-  assert(vec_data_Point(vp) == NULL);  // undefined
 }
 
 void test_grow() {
@@ -102,14 +100,10 @@ void test_set() {
 }
 
 void test_cleanup() {
-  Vec_int* bookmark = NULL;
   {
     Vec_int* v VEC_CLEANUP(int) = vec_create_int();
     vec_push_int(v, 10);
-    bookmark = v;
-    assert(vec_data_int(bookmark));
   }
-  assert(vec_data_int(bookmark) == NULL);
 }
 
 int main(int argc, char const* argv[]) {
