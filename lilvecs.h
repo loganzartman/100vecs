@@ -7,7 +7,17 @@
 #define VEC_GROW_FACTOR 1.5
 #endif
 
-#define VEC_INSTANCE(T)                                                      \
+#define VEC_DECL(T)                                             \
+  extern struct Vec_##T extern void vec_create_##T(Vec_##T* v); \
+  extern void vec_clear_##T(Vec##T* v);                         \
+  extern void vec_grow_##T(Vec##T* v, uint32_t capacity);       \
+  extern T* vec_get_##T(Vec_##T* v, uint32_t i);                \
+  extern void vec_set_##T(Vec_##T* v, uint32_t i, T* item);     \
+  extern void vec_push_##T(Vec_##T* v, T* item);                \
+  extern T* vec_pop_##T(Vec_##T* v);                            \
+  extern void vec_foreach_##T(Vec_##T* v, void fn(T*, uint32_t));
+
+#define VEC_IMPL(T)                                                          \
   typedef struct Vec_##T {                                                   \
     uint32_t size;                                                           \
     uint32_t capacity;                                                       \
