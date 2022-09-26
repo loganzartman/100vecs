@@ -22,7 +22,8 @@ _super naïve type-templated vector functions in C_
 VEC_IMPL(int)
 
 int main(int argc, char const* argv[]) {
-  Vec_int* v = vec_create_int();
+  // will be freed automatically
+  Vec_int* v VEC_CLEANUP(int) = vec_create_int();
 
   for (int i = 0; i < 100; ++i) {
     vec_push_int(v, i);
@@ -31,7 +32,6 @@ int main(int argc, char const* argv[]) {
   printf("v[42] = %d\n", vec_get_int(v, 42));
   printf("size: %d, capacity: %d\n", vec_size(v), vec_capacity(v));
 
-  vec_delete_int(v);
   return 0;
 }
 ```
@@ -51,7 +51,7 @@ typedef struct Point {
 VEC_IMPL(Point)
 
 int main(int argc, char const* argv[]) {
-  Vec_Point* v = vec_create_Point();
+  Vec_Point* v VEC_CLEANUP(Point) = vec_create_Point();
 
   vec_push_Point(v, (Point){
     .x=3.14,
@@ -66,8 +66,6 @@ int main(int argc, char const* argv[]) {
 
   Point p = vec_get_Point(v, 1);
   printf("v[1] = %s (%f, %f)\n", p.label, p.x, p.y);
-
-  vec_delete_Point(v);
   return 0;
 }
 ```
@@ -84,10 +82,8 @@ For using vectors in header files; the same VEC_DECL may appear several times.
 VEC_DECL(float)
 
 int main(int argc, char const* argv[]) {
-  Vec_float* v = vec_create_float();
+  Vec_float* v VEC_CLEANUP(float) = vec_create_float();
   vec_push_float(v, 1.337);
-  vec_delete_float(v);
-
   return 0;
 }
 
