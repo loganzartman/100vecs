@@ -1,2 +1,4 @@
 lilvecs_test.exe
 lilvecs_test
+*.o
+
