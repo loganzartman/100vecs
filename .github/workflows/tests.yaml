@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  run-tests:
+    runs-on: ${{ fromJSON('["ubuntu-latest", "self-hosted"]')[github.repository == 'loganzartman/lilvecs'] }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Install build-essential
+        run: sudo apt-get install build-essential
+
+      - name: Run tests
+        run: make test
