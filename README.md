@@ -30,7 +30,7 @@ int main(int argc, char const* argv[]) {
   }
 
   printf("v[42] = %d\n", vec_get_int(v, 42));
-  printf("size: %d, capacity: %d\n", vec_size(v), vec_capacity(v));
+  printf("size: %d, capacity: %d\n", vec_size_int(v), vec_capacity_int(v));
 
   return 0;
 }
