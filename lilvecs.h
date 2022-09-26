@@ -38,8 +38,8 @@
   extern void vec_clear_##T(Vec_##T* v);                                       \
   extern void vec_grow_##T(Vec_##T* v, VEC_SIZE_T capacity);                   \
   extern void vec_compact_##T(Vec_##T* v);                                     \
-  extern ITEM_TYPE(T) vec_get_##T(Vec_##T* v, VEC_SIZE_T i);                   \
-  extern void vec_set_##T(Vec_##T* v, VEC_SIZE_T i, ITEM_TYPE(T) item);        \
+  extern ITEM_TYPE(T) vec_get_##T(Vec_##T* v, VEC_SIZE_T index);               \
+  extern void vec_set_##T(Vec_##T* v, VEC_SIZE_T index, ITEM_TYPE(T) item);    \
   extern void vec_push_##T(Vec_##T* v, ITEM_TYPE(T) item);                     \
   extern ITEM_TYPE(T) vec_pop_##T(Vec_##T* v);                                 \
   extern void vec_insert_##T(Vec_##T* v, VEC_SIZE_T index, ITEM_TYPE(T) item); \
@@ -123,20 +123,20 @@
     v->capacity = v->size;                                                  \
   }                                                                         \
                                                                             \
-  ITEM_TYPE(T) vec_get_##T(Vec_##T* v, VEC_SIZE_T i) {                      \
+  ITEM_TYPE(T) vec_get_##T(Vec_##T* v, VEC_SIZE_T index) {                  \
     assert(v);                                                              \
-    assert(i >= 0);                                                         \
-    assert(i < v->size);                                                    \
+    assert(index >= 0);                                                     \
+    assert(index < v->size);                                                \
                                                                             \
-    return ITEM_DEREF(v->data + i);                                         \
+    return ITEM_DEREF(v->data + index);                                     \
   }                                                                         \
                                                                             \
-  void vec_set_##T(Vec_##T* v, VEC_SIZE_T i, ITEM_TYPE(T) item) {           \
+  void vec_set_##T(Vec_##T* v, VEC_SIZE_T index, ITEM_TYPE(T) item) {       \
     assert(v);                                                              \
-    assert(i >= 0);                                                         \
-    assert(i < v->size);                                                    \
+    assert(index >= 0);                                                     \
+    assert(index < v->size);                                                \
                                                                             \
-    v->data[i] = ITEM_REF(item);                                            \
+    v->data[index] = ITEM_REF(item);                                        \
   }                                                                         \
                                                                             \
   void vec_push_##T(Vec_##T* v, ITEM_TYPE(T) item) {                        \
