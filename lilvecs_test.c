@@ -228,6 +228,30 @@ void test_remove() {
   }
 }
 
+void test_insert_items() {
+  // middle
+  {
+    Vec_int* v = vec_create_int();
+    vec_push_int(v, 10);
+    vec_push_int(v, 20);
+    vec_push_int(v, 30);
+
+    Vec_int* v2 = vec_create_int();
+    vec_push_int(v2, 11);
+    vec_push_int(v2, 12);
+
+    vec_insert_items_int(v, 1, vec_size_int(v2), vec_data_int(v2));
+    assert(vec_size_int(v) == 5);
+    assert(vec_get_int(v, 0) == 10);
+    assert(vec_get_int(v, 1) == 11);
+    assert(vec_get_int(v, 2) == 12);
+    assert(vec_get_int(v, 3) == 20);
+    assert(vec_get_int(v, 4) == 30);
+    vec_delete_int(v);
+    vec_delete_int(v2);
+  }
+}
+
 int main(int argc, char const* argv[]) {
   printf("test_create\n");
   test_create();
@@ -247,6 +271,8 @@ int main(int argc, char const* argv[]) {
   test_insert();
   printf("test_remove\n");
   test_remove();
+  printf("test_insert_items\n");
+  test_insert_items();
 
   return 0;
 }
