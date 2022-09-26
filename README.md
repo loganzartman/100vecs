@@ -8,10 +8,11 @@ _super naïve type-templated vector functions in C_
 
 –some individual whomst write C for a living
 
-## Building
+## Overview
 
 * Header only! `#include "lilvecs.h"`
 * Run tests: `make test`
+* [List of functions](function_list.md)
 
 ## Basic usage
 
