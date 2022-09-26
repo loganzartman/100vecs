@@ -96,6 +96,21 @@ void test_pop() {
   vec_delete_int(vi);
 }
 
+void test_compact() {
+  Vec_int* vi = vec_create_int();
+  for (int i = 0; i < 10; ++i) {
+    vec_push_int(vi, i);
+  }
+  vec_pop_int(vi);
+  assert(vec_capacity_int(vi) >= 10);
+  vec_compact_int(vi);
+  assert(vec_capacity_int(vi) == 9);
+  vec_compact_int(vi);
+  assert(vec_capacity_int(vi) == 9);
+
+  vec_delete_int(vi);
+}
+
 void test_set() {
   Vec_int* vi = vec_create_int();
   vec_push_int(vi, 10);
@@ -263,6 +278,8 @@ int main(int argc, char const* argv[]) {
   test_push();
   printf("test_pop\n");
   test_pop();
+  printf("test_compact\n");
+  test_compact();
   printf("test_set\n");
   test_set();
   printf("test_cleanup\n");
