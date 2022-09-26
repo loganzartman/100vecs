@@ -1,8 +1,17 @@
 # lilvecs
 
-> "An objectively bad idea"
+_super naïve type-templated vector functions in C_
 
-–some guy that writes C for a living
+## Testimonials
+
+> "An objectively bad idea. 😒"
+
+–some individual whomst write C for a living
+
+## Building
+
+* Header only! `#include "lilvecs.h"`
+* Run tests: `make test`
 
 ## Basic usage
 
@@ -71,6 +80,7 @@ For using vectors in header files; the same VEC_DECL may appear several times.
 #include "lilvecs.h"
 #include <stdio.h>
 
+// put these wherever to start calling library functions
 VEC_DECL(float)
 
 int main(int argc, char const* argv[]) {
@@ -81,5 +91,6 @@ int main(int argc, char const* argv[]) {
   return 0;
 }
 
+// need exactly one of these per compilation unit
 VEC_IMPL(float)
 ```
