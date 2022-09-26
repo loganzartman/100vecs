@@ -149,7 +149,7 @@
     assert(v);                                                           \
     assert(v->size > 0);                                                 \
                                                                          \
-    T result = vec_get_##T(v, v->size - 1);                              \
+    ITEM_TYPE(T) result = vec_get_##T(v, v->size - 1);                   \
     v->size -= 1;                                                        \
     return result;                                                       \
   }                                                                      \
