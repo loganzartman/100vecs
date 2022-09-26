@@ -18,11 +18,11 @@
 #if VEC_DATA_POINTERS
 #define ITEM_TYPE(T) T*
 #define ITEM_DEREF(item) (item)
-#define ITEM_REF(item) (item)
+#define ITEM_REF(item) *(item)
 #else
 #define ITEM_TYPE(T) T
 #define ITEM_DEREF(item) *(item)
-#define ITEM_REF(item) &(item)
+#define ITEM_REF(item) (item)
 #endif
 
 #define VEC_CLEANUP(T) __attribute__((__cleanup__(vec_cleanup_##T)))
@@ -52,7 +52,7 @@
   typedef struct Vec_##T {                                                  \
     VEC_SIZE_T size;                                                        \
     VEC_SIZE_T capacity;                                                    \
-    uint8_t* data;                                                          \
+    T* data;                                                                \
   } Vec_##T;                                                                \
                                                                             \
   Vec_##T* vec_create_##T() {                                               \
@@ -84,7 +84,7 @@
   }                                                                         \
                                                                             \
   T* vec_data_##T(Vec_##T* v) {                                             \
-    return (T*)v->data;                                                     \
+    return v->data;                                                         \
   }                                                                         \
                                                                             \
   void vec_clear_##T(Vec_##T* v) {                                          \
@@ -128,7 +128,7 @@
     assert(i >= 0);                                                         \
     assert(i < v->size);                                                    \
                                                                             \
-    return ITEM_DEREF((T*)(v->data + i * sizeof(T)));                       \
+    return ITEM_DEREF(v->data + i);                                         \
   }                                                                         \
                                                                             \
   void vec_set_##T(Vec_##T* v, VEC_SIZE_T i, ITEM_TYPE(T) item) {           \
@@ -136,7 +136,7 @@
     assert(i >= 0);                                                         \
     assert(i < v->size);                                                    \
                                                                             \
-    memcpy(v->data + i * sizeof(T), ITEM_REF(item), sizeof(T));             \
+    v->data[i] = ITEM_REF(item);                                            \
   }                                                                         \
                                                                             \
   void vec_push_##T(Vec_##T* v, ITEM_TYPE(T) item) {                        \
