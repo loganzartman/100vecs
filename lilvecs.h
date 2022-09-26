@@ -7,14 +7,18 @@
 #define VEC_GROW_FACTOR 1.5
 #endif
 
-#define VEC_DECL(T)                                             \
-  extern struct Vec_##T extern void vec_create_##T(Vec_##T* v); \
-  extern void vec_clear_##T(Vec##T* v);                         \
-  extern void vec_grow_##T(Vec##T* v, uint32_t capacity);       \
-  extern T* vec_get_##T(Vec_##T* v, uint32_t i);                \
-  extern void vec_set_##T(Vec_##T* v, uint32_t i, T* item);     \
-  extern void vec_push_##T(Vec_##T* v, T* item);                \
-  extern T* vec_pop_##T(Vec_##T* v);                            \
+#define VEC_DECL(T)                                         \
+  typedef struct Vec_##T Vec_##T;                           \
+  extern Vec_##T* vec_create_##T();                         \
+  extern void vec_delete_##T(Vec_##T* v);                   \
+  extern uint32_t vec_capacity_##T(Vec_##T* v);             \
+  extern uint32_t vec_size_##T(Vec_##T* v);                 \
+  extern void vec_clear_##T(Vec_##T* v);                    \
+  extern void vec_grow_##T(Vec_##T* v, uint32_t capacity);  \
+  extern T* vec_get_##T(Vec_##T* v, uint32_t i);            \
+  extern void vec_set_##T(Vec_##T* v, uint32_t i, T* item); \
+  extern void vec_push_##T(Vec_##T* v, T* item);            \
+  extern T* vec_pop_##T(Vec_##T* v);                        \
   extern void vec_foreach_##T(Vec_##T* v, void fn(T*, uint32_t));
 
 #define VEC_IMPL(T)                                                          \
@@ -24,12 +28,27 @@
     uint8_t* data;                                                           \
   } Vec_##T;                                                                 \
                                                                              \
-  void vec_create_##T(Vec_##T* v) {                                          \
-    assert(v);                                                               \
-                                                                             \
+  Vec_##T* vec_create_##T() {                                                \
+    Vec_##T* v = malloc(sizeof(Vec_##T));                                    \
     v->size = 0;                                                             \
     v->capacity = 0;                                                         \
     v->data = NULL;                                                          \
+    return v;                                                                \
+  }                                                                          \
+                                                                             \
+  void vec_delete_##T(Vec_##T* v) {                                          \
+    if (v->data) {                                                           \
+      free(v->data);                                                         \
+    }                                                                        \
+    free(v);                                                                 \
+  }                                                                          \
+                                                                             \
+  uint32_t vec_capacity_##T(Vec_##T* v) {                                    \
+    return v->capacity;                                                      \
+  }                                                                          \
+                                                                             \
+  uint32_t vec_size_##T(Vec_##T* v) {                                        \
+    return v->size;                                                          \
   }                                                                          \
                                                                              \
   void vec_clear_##T(Vec_##T* v) {                                           \
