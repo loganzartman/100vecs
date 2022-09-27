@@ -1,4 +1,4 @@
-# lilvecs
+# 100vecs
 
 _super naïve type-templated vector functions in C_
 
@@ -10,14 +10,14 @@ _super naïve type-templated vector functions in C_
 
 ## Overview
 
-* Header only! `#include "lilvecs.h"`
+* Header only! `#include "100vecs.h"`
 * Run tests: `make test`
 * [List of functions](function_list.md)
 
 ## Basic usage
 
 ```C
-#include "lilvecs.h"
+#include "100vecs.h"
 #include <stdio.h>
 
 // generate definitions for vectors of ints
@@ -44,7 +44,7 @@ int main(int argc, char const* argv[]) {
 ## Store anything
 
 ```C
-#include "../lilvecs.h"
+#include "../100vecs.h"
 #include <stdio.h>
 
 typedef struct Point {
@@ -87,7 +87,7 @@ int main(int argc, char const* argv[]) {
 The only limitation is that the Vec_T structs are incomplete and can only be referenced as pointers, but I've designed the API around that anyway. You still need a `VEC_IMPL` for each type somewhere!
 
 ```C
-#include "lilvecs.h"
+#include "100vecs.h"
 #include <stdio.h>
 
 // these can go wherever you want to call vector functions!

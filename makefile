@@ -3,21 +3,21 @@
 CC = gcc --std=c11
 
 .PHONY: all
-all: lilvecs_test function_list.md
+all: 100vecs_test function_list.md
 
 .PHONY: clean
 clean: 
-	rm -f *.o lilvecs_test lilvecs_test.exe function_list.md
+	rm -f *.o 100vecs_test 100vecs_test.exe function_list.md
 
 .PHONY: test
-test: lilvecs_test
-	./lilvecs_test
+test: 100vecs_test
+	./100vecs_test
 
-lilvecs_test: lilvecs_test.c lilvecs.h
-	$(CC) lilvecs_test.c -o lilvecs_test
+100vecs_test: 100vecs_test.c 100vecs.h
+	$(CC) 100vecs_test.c -o 100vecs_test
 
-function_list.md: lilvecs.h
-	printf '#include "lilvecs.h"\nVEC_DECL(T)' > function_list.c
+function_list.md: 100vecs.h
+	printf '#include "100vecs.h"\nVEC_DECL(T)' > function_list.c
 	echo "\`\`\`C" > function_list.md
 	$(CC) -E function_list.c -o- \
 		| grep -w Vec_T \
