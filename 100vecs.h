@@ -1,7 +1,14 @@
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+//  888  888  .d88b.   .d8888b .d8888b
+//  888  888 d8P  Y8b d88P"    88K
+//  Y88  88P 88888888 888      "Y8888b.
+//   Y8bd8P  Y8b.     Y88b.         X88
+//    Y88P    "Y8888   "Y8888P  88888P'
 
 #if !defined(VEC_SIZE_T)
 #define VEC_SIZE_T uint32_t
@@ -206,4 +213,163 @@
   void vec_qsort_##T(Vec_##T* v, int comparator(const T* a, const T* b)) {     \
     qsort(v->data, v->size, sizeof(T),                                         \
           (int (*)(const void*, const void*))comparator);                      \
+  }
+
+//  88888b.d88b.   8888b.  88888b.  .d8888b
+//  888 "888 "88b     "88b 888 "88b 88K
+//  888  888  888 .d888888 888  888 "Y8888b.
+//  888  888  888 888  888 888 d88P      X88
+//  888  888  888 "Y888888 88888P"   88888P'
+//                         888
+//                         888
+
+#if !defined(MAP_DEFAULT_CAPACITY)
+#define MAP_DEFAULT_CAPACITY 10
+#endif
+
+#if !defined(MAP_MAX_LOAD)
+#define MAP_MAX_LOAD 0.6
+#endif
+
+#define MAP_MIN_LOAD (MAP_MAX_LOAD * 0.25)
+#define MAP_GROW_FACTOR 2.0
+#define MAP_SHRINK_FACTOR 0.5
+
+#define MAP_DECL(K, V)                                                         \
+  typedef struct MapEntry_##K##__##V MapEntry_##K##__##V;                      \
+  typedef struct Map_##K##__##V Map_##K##__##V;                                \
+  extern VEC_SIZE_T map_size_##K##__##V(Map_##K##__##V* m);                    \
+  extern VEC_SIZE_T map_capacity_##K##__##V(Map_##K##__##V* m);                \
+  extern MapEntry_##K##__##V* map_data_##K##__##V(Map_##K##__##V* m);          \
+  extern Map_##K##__##V* map_create_##K##__##V(int hash(K key));               \
+  extern void map_delete_##K##__##V(Map_##K##__##V* m);                        \
+  extern void map_put_unsafe_##K##__##V(Map_##K##__##V* m,                     \
+                                        MapEntry_##K##__##V entry);            \
+  extern void map_resize_##K##__##V(Map_##K##__##V* m);                        \
+  extern V* map_get_##K##__##V(Map_##K##__##V* map, K key);                    \
+  extern V map_get_else_##K##__##V(Map_##K##__##V* map, K key, V else_);       \
+  extern bool map_has_##K##__##V(Map_##K##__##V* m, K key);                    \
+  extern void map_put_##K##__##V(Map_##K##__##V* map, K key, V value);
+
+#define MAP_IMPL(K, V)                                                         \
+  typedef struct MapEntry_##K##__##V {                                         \
+    K key;                                                                     \
+    V value;                                                                   \
+  } MapEntry_##K##__##V;                                                       \
+                                                                               \
+  typedef struct Map_##K##__##V {                                              \
+    VEC_SIZE_T size;                                                           \
+    VEC_SIZE_T capacity;                                                       \
+    int (*hash)(K key);                                                        \
+    MapEntry_##K##__##V* data;                                                 \
+    bool* data_present;                                                        \
+  } Map_##K##__##V;                                                            \
+                                                                               \
+  VEC_SIZE_T map_size_##K##__##V(Map_##K##__##V* m) {                          \
+    return m->size;                                                            \
+  }                                                                            \
+                                                                               \
+  VEC_SIZE_T map_capacity_##K##__##V(Map_##K##__##V* m) {                      \
+    return m->capacity;                                                        \
+  };                                                                           \
+                                                                               \
+  MapEntry_##K##__##V* map_data_##K##__##V(Map_##K##__##V* m) {                \
+    return m->data;                                                            \
+  };                                                                           \
+                                                                               \
+  Map_##K##__##V* map_create_##K##__##V(int hash(K key)) {                     \
+    Map_##K##__##V* m = malloc(sizeof(Map_##K##__##V));                        \
+    m->size = 0;                                                               \
+    m->capacity = 0;                                                           \
+    m->hash = hash;                                                            \
+    m->data = NULL;                                                            \
+    return m;                                                                  \
+  }                                                                            \
+                                                                               \
+  void map_delete_##K##__##V(Map_##K##__##V* m) {                              \
+    if (m->data) {                                                             \
+      free(m->data);                                                           \
+      m->data = NULL;                                                          \
+    }                                                                          \
+    free(m);                                                                   \
+  }                                                                            \
+                                                                               \
+  void map_put_unsafe_##K##__##V(Map_##K##__##V* m,                            \
+                                 MapEntry_##K##__##V entry) {                  \
+    int h = m->hash(entry.key);                                                \
+    int i0 = h % m->capacity;                                                  \
+    int i = i0;                                                                \
+    while (m->data_present[i]) {                                               \
+      i = (i + 1) % m->capacity;                                               \
+      assert(i != i0);                                                         \
+    }                                                                          \
+    m->data[i] = entry;                                                        \
+    m->data_present[i] = true;                                                 \
+    m->size += 1;                                                              \
+  }                                                                            \
+                                                                               \
+  void map_resize_##K##__##V(Map_##K##__##V* m) {                              \
+    if (m->data) {                                                             \
+      float load = (float)m->size / m->capacity;                               \
+      if (load > MAP_MAX_LOAD || load < MAP_MIN_LOAD) {                        \
+        VEC_SIZE_T old_capacity = m->capacity;                                 \
+        MapEntry_##K##__##V* old_data = m->data;                               \
+        bool* old_data_present = m->data_present;                              \
+                                                                               \
+        if (load > MAP_MAX_LOAD) {                                             \
+          m->capacity = (VEC_SIZE_T)(m->capacity * MAP_GROW_FACTOR);           \
+        } else {                                                               \
+          m->capacity = (VEC_SIZE_T)(m->capacity * MAP_SHRINK_FACTOR);         \
+        }                                                                      \
+                                                                               \
+        m->size = 0;                                                           \
+        m->data = malloc(m->capacity * sizeof(MapEntry_##K##__##V));           \
+        m->data_present = calloc(m->capacity, sizeof(bool));                   \
+                                                                               \
+        for (int i = 0; i < old_capacity; ++i) {                               \
+          if (old_data_present[i]) {                                           \
+            map_put_unsafe_##K##__##V(m, old_data[i]);                         \
+          }                                                                    \
+        }                                                                      \
+                                                                               \
+        free(old_data);                                                        \
+        free(old_data_present);                                                \
+      }                                                                        \
+    } else {                                                                   \
+      m->capacity = MAP_DEFAULT_CAPACITY;                                      \
+      m->data = malloc(m->capacity * sizeof(V));                               \
+      m->data_present = calloc(m->capacity, sizeof(bool));                     \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  V* map_get_##K##__##V(Map_##K##__##V* m, K key) {                            \
+    int h = m->hash(key);                                                      \
+    int i0 = h % m->capacity;                                                  \
+    int i = i0;                                                                \
+    while (m->data_present[i]) {                                               \
+      if (m->data[i].key == key) {                                             \
+        return &m->data[i].value;                                              \
+      }                                                                        \
+      i = (i + 1) % m->capacity;                                               \
+      assert(i != i0);                                                         \
+    }                                                                          \
+    return NULL;                                                               \
+  }                                                                            \
+                                                                               \
+  V map_get_else_##K##__##V(Map_##K##__##V* m, K key, V else_) {               \
+    V* maybe_v = map_get_##K##__##V(m, key);                                   \
+    if (!maybe_v) {                                                            \
+      return else_;                                                            \
+    }                                                                          \
+    return *maybe_v;                                                           \
+  }                                                                            \
+                                                                               \
+  bool map_has_##K##__##V(Map_##K##__##V* m, K key) {                          \
+    return map_get_##K##__##V(m, key) != NULL;                                 \
+  }                                                                            \
+                                                                               \
+  void map_put_##K##__##V(Map_##K##__##V* m, K key, V value) {                 \
+    map_resize_##K##__##V(m);                                                  \
+    map_put_unsafe_##K##__##V(                                                 \
+        m, (MapEntry_##K##__##V){.key = key, .value = value});                 \
   }

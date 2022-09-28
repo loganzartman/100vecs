@@ -81,17 +81,9 @@ void test_push() {
 
   Vec_Point* vp = vec_create_Point();
   assert(vec_size_Point(vp) == 0);
-  vec_push_Point(vp, (Point){
-    .label="spot",
-    .x=420.0,
-    .y=69.0
-  });
+  vec_push_Point(vp, (Point){.label = "spot", .x = 420.0, .y = 69.0});
   assert(vec_size_Point(vp) == 1);
-  vec_push_Point(vp, (Point){
-    .label="point",
-    .x=1337.0,
-    .y=42.0
-  });
+  vec_push_Point(vp, (Point){.label = "point", .x = 1337.0, .y = 42.0});
   assert(vec_size_Point(vp) == 2);
   assert(vec_get_Point(vp, 1).x == 1337.0);
   vec_delete_Point(vp);
@@ -301,6 +293,8 @@ void test_qsort() {
 
 extern void test_nesting();
 
+extern void test_map();
+
 int main(int argc, char const* argv[]) {
   printf("test_create\n");
   test_create();
@@ -328,8 +322,12 @@ int main(int argc, char const* argv[]) {
   test_insert_items();
   printf("test_qsort\n");
   test_qsort();
+
   printf("test_nesting\n");
   test_nesting();
+
+  printf("test_map\n");
+  test_map();
 
   return 0;
 }
