@@ -8,8 +8,12 @@ int hash_int(int i) {
   return i;
 }
 
+bool eq_int(int a, int b) {
+  return a == b;
+}
+
 void test_map_put() {
-  Map_int__int* m = map_create_int__int(hash_int);
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
   map_put_int__int(m, 1, 10);
   map_put_int__int(m, 5, 420);
 
@@ -17,7 +21,7 @@ void test_map_put() {
 }
 
 void test_map_grow() {
-  Map_int__int* m = map_create_int__int(hash_int);
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
   map_put_int__int(m, 1, 10);
   printf("  size: %d, capacity: %d\n", map_size_int__int(m),
          map_capacity_int__int(m));
@@ -41,7 +45,7 @@ void test_map_grow() {
 }
 
 void test_map_shrink() {
-  Map_int__int* m = map_create_int__int(hash_int);
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
   for (int i = 0; i < 100; ++i) {
     map_put_int__int(m, i, i * 10);
   }
@@ -72,7 +76,7 @@ void test_map_shrink() {
 }
 
 void test_map_get() {
-  Map_int__int* m = map_create_int__int(hash_int);
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
   map_put_int__int(m, 1, 10);
   map_put_int__int(m, 5, 420);
 
@@ -88,7 +92,7 @@ void test_map_get() {
 }
 
 void test_map_has() {
-  Map_int__int* m = map_create_int__int(hash_int);
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
   map_put_int__int(m, 1, 10);
 
   assert(map_has_int__int(m, 1));
@@ -98,7 +102,7 @@ void test_map_has() {
 }
 
 void test_map_get_else() {
-  Map_int__int* m = map_create_int__int(hash_int);
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
   map_put_int__int(m, 1, 10);
 
   assert(map_get_else_int__int(m, 1, -1) == 10);
@@ -108,7 +112,7 @@ void test_map_get_else() {
 }
 
 void test_map_delete() {
-  Map_int__int* m = map_create_int__int(hash_int);
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
   map_put_int__int(m, 1, 10);
   map_put_int__int(m, 2, 20);
   map_put_int__int(m, 3, 30);

@@ -241,7 +241,8 @@
   extern VEC_SIZE_T map_size_##K##__##V(Map_##K##__##V* m);                    \
   extern VEC_SIZE_T map_capacity_##K##__##V(Map_##K##__##V* m);                \
   extern MapEntry_##K##__##V* map_data_##K##__##V(Map_##K##__##V* m);          \
-  extern Map_##K##__##V* map_create_##K##__##V(int hash(K key));               \
+  extern Map_##K##__##V* map_create_##K##__##V(int hash(K key),                \
+                                               bool eq(K a, K b));             \
   extern void map_destroy_##K##__##V(Map_##K##__##V* m);                       \
   extern void map_put_unsafe_##K##__##V(Map_##K##__##V* m,                     \
                                         MapEntry_##K##__##V entry);            \
@@ -262,6 +263,7 @@
     VEC_SIZE_T size;                                                           \
     VEC_SIZE_T capacity;                                                       \
     int (*hash)(K key);                                                        \
+    bool (*eq)(K a, K b);                                                      \
     MapEntry_##K##__##V* data;                                                 \
     bool* data_present;                                                        \
   } Map_##K##__##V;                                                            \
@@ -278,11 +280,13 @@
     return m->data;                                                            \
   };                                                                           \
                                                                                \
-  Map_##K##__##V* map_create_##K##__##V(int hash(K key)) {                     \
+  Map_##K##__##V* map_create_##K##__##V(int (*hash)(K key),                    \
+                                        bool (*eq)(K a, K b)) {                \
     Map_##K##__##V* m = malloc(sizeof(Map_##K##__##V));                        \
     m->size = 0;                                                               \
     m->capacity = 0;                                                           \
     m->hash = hash;                                                            \
+    m->eq = eq;                                                                \
     m->data = NULL;                                                            \
     return m;                                                                  \
   }                                                                            \
@@ -348,7 +352,7 @@
     int i0 = h % m->capacity;                                                  \
     int i = i0;                                                                \
     while (m->data_present[i]) {                                               \
-      if (m->data[i].key == key) {                                             \
+      if (m->eq(m->data[i].key, key)) {                                        \
         return &m->data[i].value;                                              \
       }                                                                        \
       i = (i + 1) % m->capacity;                                               \
@@ -380,7 +384,7 @@
     int i0 = h % m->capacity;                                                  \
     int i = i0;                                                                \
     while (m->data_present[i]) {                                               \
-      if (m->data[i].key == key) {                                             \
+      if (m->eq(m->data[i].key, key)) {                                        \
         m->data_present[i] = false;                                            \
         m->size -= 1;                                                          \
         map_resize_##K##__##V(m);                                              \
