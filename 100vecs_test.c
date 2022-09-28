@@ -31,12 +31,12 @@ void test_create() {
   assert(&*(char*)vp);
 }
 
-void test_delete() {
+void test_destroy() {
   Vec_int* vi = vec_create_int();
-  vec_delete_int(vi);
+  vec_destroy_int(vi);
 
   Vec_Point* vp = vec_create_Point();
-  vec_delete_Point(vp);
+  vec_destroy_Point(vp);
 }
 
 void test_clone() {
@@ -51,8 +51,8 @@ void test_clone() {
   assert(vec_get_int(clone, 1) == 2);
   assert(vec_get_int(clone, 2) == 3);
 
-  vec_delete_int(v);
-  vec_delete_int(clone);
+  vec_destroy_int(v);
+  vec_destroy_int(clone);
 }
 
 void test_grow() {
@@ -60,13 +60,13 @@ void test_grow() {
   assert(vec_capacity_int(vi) == 0);
   vec_grow_int(vi, 10);
   assert(vec_capacity_int(vi) >= 10);
-  vec_delete_int(vi);
+  vec_destroy_int(vi);
 
   Vec_Point* vp = vec_create_Point();
   assert(vec_capacity_Point(vp) == 0);
   vec_grow_Point(vp, 10);
   assert(vec_capacity_Point(vp) >= 10);
-  vec_delete_Point(vp);
+  vec_destroy_Point(vp);
 }
 
 void test_push() {
@@ -77,7 +77,7 @@ void test_push() {
   vec_push_int(vi, 20);
   assert(vec_size_int(vi) == 2);
   assert(vec_get_int(vi, 1) == 20);
-  vec_delete_int(vi);
+  vec_destroy_int(vi);
 
   Vec_Point* vp = vec_create_Point();
   assert(vec_size_Point(vp) == 0);
@@ -86,7 +86,7 @@ void test_push() {
   vec_push_Point(vp, (Point){.label = "point", .x = 1337.0, .y = 42.0});
   assert(vec_size_Point(vp) == 2);
   assert(vec_get_Point(vp, 1).x == 1337.0);
-  vec_delete_Point(vp);
+  vec_destroy_Point(vp);
 }
 
 void test_pop() {
@@ -101,7 +101,7 @@ void test_pop() {
   assert(vec_size_int(vi) == 1);
   assert(vec_pop_int(vi) == 10);
   assert(vec_size_int(vi) == 0);
-  vec_delete_int(vi);
+  vec_destroy_int(vi);
 }
 
 void test_compact() {
@@ -116,7 +116,7 @@ void test_compact() {
   vec_compact_int(vi);
   assert(vec_capacity_int(vi) == 9);
 
-  vec_delete_int(vi);
+  vec_destroy_int(vi);
 }
 
 void test_set() {
@@ -129,7 +129,7 @@ void test_set() {
   assert(vec_get_int(vi, 0) == 10);
   assert(vec_get_int(vi, 1) == 40);
   assert(vec_get_int(vi, 2) == 30);
-  vec_delete_int(vi);
+  vec_destroy_int(vi);
 }
 
 void test_cleanup() {
@@ -153,7 +153,7 @@ void test_insert() {
     assert(vec_get_int(v, 1) == 15);
     assert(vec_get_int(v, 2) == 20);
     assert(vec_get_int(v, 3) == 30);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
   // beginning
   {
@@ -168,7 +168,7 @@ void test_insert() {
     assert(vec_get_int(v, 1) == 10);
     assert(vec_get_int(v, 2) == 20);
     assert(vec_get_int(v, 3) == 30);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
   // end
   {
@@ -183,7 +183,7 @@ void test_insert() {
     assert(vec_get_int(v, 1) == 20);
     assert(vec_get_int(v, 2) == 30);
     assert(vec_get_int(v, 3) == 35);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
   // empty
   {
@@ -192,7 +192,7 @@ void test_insert() {
     vec_insert_int(v, 0, 10);
     assert(vec_size_int(v) == 1);
     assert(vec_get_int(v, 0) == 10);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
 }
 
@@ -209,7 +209,7 @@ void test_remove() {
     assert(vec_size_int(v) == 2);
     assert(vec_get_int(v, 0) == 10);
     assert(vec_get_int(v, 1) == 30);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
   // beginning
   {
@@ -223,7 +223,7 @@ void test_remove() {
     assert(vec_size_int(v) == 2);
     assert(vec_get_int(v, 0) == 20);
     assert(vec_get_int(v, 1) == 30);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
   // end
   {
@@ -237,7 +237,7 @@ void test_remove() {
     assert(vec_size_int(v) == 2);
     assert(vec_get_int(v, 0) == 10);
     assert(vec_get_int(v, 1) == 20);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
   // only item
   {
@@ -247,7 +247,7 @@ void test_remove() {
     int removed = vec_remove_int(v, 0);
     assert(removed == 10);
     assert(vec_size_int(v) == 0);
-    vec_delete_int(v);
+    vec_destroy_int(v);
   }
 }
 
@@ -270,8 +270,8 @@ void test_insert_items() {
     assert(vec_get_int(v, 2) == 12);
     assert(vec_get_int(v, 3) == 20);
     assert(vec_get_int(v, 4) == 30);
-    vec_delete_int(v);
-    vec_delete_int(v2);
+    vec_destroy_int(v);
+    vec_destroy_int(v2);
   }
 }
 
@@ -298,8 +298,8 @@ extern void test_map();
 int main(int argc, char const* argv[]) {
   printf("test_create\n");
   test_create();
-  printf("test_delete\n");
-  test_delete();
+  printf("test_destroy\n");
+  test_destroy();
   printf("test_clone\n");
   test_clone();
   printf("test_grow\n");

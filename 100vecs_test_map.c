@@ -14,7 +14,7 @@ void test_map_put() {
   map_put_int__int(m, 1, 10);
   map_put_int__int(m, 5, 420);
 
-  map_delete_int__int(m);
+  map_destroy_int__int(m);
 }
 
 void test_map_grow() {
@@ -38,7 +38,7 @@ void test_map_grow() {
          map_capacity_int__int(m));
   assert(map_capacity_int__int(m) > 100 / MAP_MAX_LOAD);
 
-  map_delete_int__int(m);
+  map_destroy_int__int(m);
 }
 
 void test_map_shrink() {
@@ -50,7 +50,7 @@ void test_map_shrink() {
   printf("  size: %d, capacity: %d\n", map_size_int__int(m),
          map_capacity_int__int(m));
 
-  map_delete_int__int(m);
+  map_destroy_int__int(m);
 }
 
 void test_map_get() {
@@ -66,7 +66,7 @@ void test_map_get() {
 
   assert(map_get_int__int(m, 2) == NULL);
 
-  map_delete_int__int(m);
+  map_destroy_int__int(m);
 }
 
 void test_map_has() {
@@ -76,7 +76,7 @@ void test_map_has() {
   assert(map_has_int__int(m, 1));
   assert(!map_has_int__int(m, 2));
 
-  map_delete_int__int(m);
+  map_destroy_int__int(m);
 }
 
 void test_map_get_else() {
@@ -86,7 +86,7 @@ void test_map_get_else() {
   assert(map_get_else_int__int(m, 1, -1) == 10);
   assert(map_get_else_int__int(m, 2, -1) == -1);
 
-  map_delete_int__int(m);
+  map_destroy_int__int(m);
 }
 
 void test_map() {

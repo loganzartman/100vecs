@@ -10,9 +10,9 @@ _super naïve type-templated vector functions in C_
 
 ## Overview
 
-* Header only! `#include "100vecs.h"`
-* Run tests: `make test`
-* [List of functions](function_list.md)
+- Header only! `#include "100vecs.h"`
+- Run tests: `make test`
+- [List of functions](function_list.md)
 
 ## Basic usage
 
@@ -36,7 +36,7 @@ int main(int argc, char const* argv[]) {
   printf("v[42] = %d\n", item);
   printf("size: %d, capacity: %d\n", vec_size_int(v), vec_capacity_int(v));
 
-  vec_delete_int(v);
+  vec_destroy_int(v);
   return 0;
 }
 ```

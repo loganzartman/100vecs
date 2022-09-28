@@ -23,7 +23,7 @@
 #define VEC_DECL(T)                                                            \
   typedef struct Vec_##T Vec_##T;                                              \
   extern Vec_##T* vec_create_##T();                                            \
-  extern void vec_delete_##T(Vec_##T* v);                                      \
+  extern void vec_destroy_##T(Vec_##T* v);                                     \
   extern void vec_cleanup_##T(Vec_##T** v);                                    \
   extern VEC_SIZE_T vec_size_##T(Vec_##T* v);                                  \
   extern VEC_SIZE_T vec_capacity_##T(Vec_##T* v);                              \
@@ -59,7 +59,7 @@
     return v;                                                                  \
   }                                                                            \
                                                                                \
-  void vec_delete_##T(Vec_##T* v) {                                            \
+  void vec_destroy_##T(Vec_##T* v) {                                           \
     if (v->data) {                                                             \
       free(v->data);                                                           \
       v->data = NULL;                                                          \
@@ -68,7 +68,7 @@
   }                                                                            \
                                                                                \
   void vec_cleanup_##T(Vec_##T** v) {                                          \
-    vec_delete_##T(*v);                                                        \
+    vec_destroy_##T(*v);                                                       \
   }                                                                            \
                                                                                \
   VEC_SIZE_T vec_size_##T(Vec_##T* v) {                                        \
@@ -242,7 +242,7 @@
   extern VEC_SIZE_T map_capacity_##K##__##V(Map_##K##__##V* m);                \
   extern MapEntry_##K##__##V* map_data_##K##__##V(Map_##K##__##V* m);          \
   extern Map_##K##__##V* map_create_##K##__##V(int hash(K key));               \
-  extern void map_delete_##K##__##V(Map_##K##__##V* m);                        \
+  extern void map_destroy_##K##__##V(Map_##K##__##V* m);                       \
   extern void map_put_unsafe_##K##__##V(Map_##K##__##V* m,                     \
                                         MapEntry_##K##__##V entry);            \
   extern void map_resize_##K##__##V(Map_##K##__##V* m);                        \
@@ -286,7 +286,7 @@
     return m;                                                                  \
   }                                                                            \
                                                                                \
-  void map_delete_##K##__##V(Map_##K##__##V* m) {                              \
+  void map_destroy_##K##__##V(Map_##K##__##V* m) {                             \
     if (m->data) {                                                             \
       free(m->data);                                                           \
       m->data = NULL;                                                          \
