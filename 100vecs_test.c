@@ -267,6 +267,8 @@ void test_insert_items() {
   }
 }
 
+extern void test_nesting();
+
 int main(int argc, char const* argv[]) {
   printf("test_create\n");
   test_create();
@@ -290,6 +292,8 @@ int main(int argc, char const* argv[]) {
   test_remove();
   printf("test_insert_items\n");
   test_insert_items();
+  printf("test_nesting\n");
+  test_nesting();
 
   return 0;
 }

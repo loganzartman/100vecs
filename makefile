@@ -13,8 +13,8 @@ clean:
 test: 100vecs_test
 	./100vecs_test
 
-100vecs_test: 100vecs_test.c 100vecs.h
-	$(CC) 100vecs_test.c -o 100vecs_test
+100vecs_test: 100vecs.h 100vecs_test.c 100vecs_test_nesting.c
+	$(CC) 100vecs_test.c 100vecs_test_nesting.c -o 100vecs_test
 
 function_list.md: 100vecs.h
 	printf '#include "100vecs.h"\nVEC_DECL(T)' > function_list.c
