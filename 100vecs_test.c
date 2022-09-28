@@ -39,6 +39,22 @@ void test_delete() {
   vec_delete_Point(vp);
 }
 
+void test_clone() {
+  Vec_int* v = vec_create_int();
+  vec_push_int(v, 1);
+  vec_push_int(v, 2);
+  vec_push_int(v, 3);
+
+  Vec_int* clone = vec_clone_int(v);
+  assert(vec_size_int(clone) == 3);
+  assert(vec_get_int(clone, 0) == 1);
+  assert(vec_get_int(clone, 1) == 2);
+  assert(vec_get_int(clone, 2) == 3);
+
+  vec_delete_int(v);
+  vec_delete_int(clone);
+}
+
 void test_grow() {
   Vec_int* vi = vec_create_int();
   assert(vec_capacity_int(vi) == 0);
@@ -290,6 +306,8 @@ int main(int argc, char const* argv[]) {
   test_create();
   printf("test_delete\n");
   test_delete();
+  printf("test_clone\n");
+  test_clone();
   printf("test_grow\n");
   test_grow();
   printf("test_push\n");

@@ -35,6 +35,7 @@
   extern VEC_SIZE_T vec_size_##T(Vec_##T* v);                                  \
   extern VEC_SIZE_T vec_capacity_##T(Vec_##T* v);                              \
   extern T* vec_data_##T(Vec_##T* v);                                          \
+  extern Vec_##T* vec_clone_##T(Vec_##T* v);                                   \
   extern void vec_clear_##T(Vec_##T* v);                                       \
   extern void vec_grow_##T(Vec_##T* v, VEC_SIZE_T capacity);                   \
   extern void vec_compact_##T(Vec_##T* v);                                     \
@@ -87,6 +88,16 @@
                                                                                \
   T* vec_data_##T(Vec_##T* v) {                                                \
     return v->data;                                                            \
+  }                                                                            \
+                                                                               \
+  Vec_##T* vec_clone_##T(Vec_##T* v) {                                         \
+    assert(v);                                                                 \
+                                                                               \
+    Vec_##T* result = vec_create_##T();                                        \
+    vec_grow_##T(result, v->size);                                             \
+    memcpy(result->data, v->data, v->size * sizeof(T));                        \
+    result->size = v->size;                                                    \
+    return result;                                                             \
   }                                                                            \
                                                                                \
   void vec_clear_##T(Vec_##T* v) {                                             \
