@@ -24,6 +24,7 @@ uint32_t vec_size_T(Vec_T* v);
 
 ## maps
 ```C
+map_delete_K__V(Map_K__V* m, K key);
 map_has_K__V(Map_K__V* m, K key);
 typedef struct MapEntry_K__V MapEntry_K__V;
 typedef struct Map_K__V Map_K__V;
@@ -31,9 +32,9 @@ uint32_t map_capacity_K__V(Map_K__V* m);
 Map_K__V* map_create_K__V(int hash(K key));
 MapEntry_K__V* map_data_K__V(Map_K__V* m);
 void map_destroy_K__V(Map_K__V* m);
-V* map_get_K__V(Map_K__V* map, K key);
-V map_get_else_K__V(Map_K__V* map, K key, V else_);
-void map_put_K__V(Map_K__V* map, K key, V value);
+V* map_get_K__V(Map_K__V* m, K key);
+V map_get_else_K__V(Map_K__V* m, K key, V else_);
+void map_put_K__V(Map_K__V* m, K key, V value);
 void map_put_unsafe_K__V(Map_K__V* m, MapEntry_K__V entry);
 void map_resize_K__V(Map_K__V* m);
 uint32_t map_size_K__V(Map_K__V* m);

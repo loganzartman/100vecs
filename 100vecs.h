@@ -246,10 +246,11 @@
   extern void map_put_unsafe_##K##__##V(Map_##K##__##V* m,                     \
                                         MapEntry_##K##__##V entry);            \
   extern void map_resize_##K##__##V(Map_##K##__##V* m);                        \
-  extern V* map_get_##K##__##V(Map_##K##__##V* map, K key);                    \
-  extern V map_get_else_##K##__##V(Map_##K##__##V* map, K key, V else_);       \
+  extern V* map_get_##K##__##V(Map_##K##__##V* m, K key);                      \
+  extern V map_get_else_##K##__##V(Map_##K##__##V* m, K key, V else_);         \
   extern bool map_has_##K##__##V(Map_##K##__##V* m, K key);                    \
-  extern void map_put_##K##__##V(Map_##K##__##V* map, K key, V value);
+  extern void map_put_##K##__##V(Map_##K##__##V* m, K key, V value);           \
+  extern bool map_delete_##K##__##V(Map_##K##__##V* m, K key);
 
 #define MAP_IMPL(K, V)                                                         \
   typedef struct MapEntry_##K##__##V {                                         \
@@ -372,4 +373,21 @@
     map_resize_##K##__##V(m);                                                  \
     map_put_unsafe_##K##__##V(                                                 \
         m, (MapEntry_##K##__##V){.key = key, .value = value});                 \
+  }                                                                            \
+                                                                               \
+  bool map_delete_##K##__##V(Map_##K##__##V* m, K key) {                       \
+    int h = m->hash(key);                                                      \
+    int i0 = h % m->capacity;                                                  \
+    int i = i0;                                                                \
+    while (m->data_present[i]) {                                               \
+      if (m->data[i].key == key) {                                             \
+        m->data_present[i] = false;                                            \
+        m->size -= 1;                                                          \
+        map_resize_##K##__##V(m);                                              \
+        return true;                                                           \
+      }                                                                        \
+      i = (i + 1) % m->capacity;                                               \
+      assert(i != i0);                                                         \
+    }                                                                          \
+    return false;                                                              \
   }

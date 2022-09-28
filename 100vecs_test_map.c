@@ -3,7 +3,6 @@
 #include "100vecs.h"
 
 MAP_DECL(int, int)
-MAP_IMPL(int, int)
 
 int hash_int(int i) {
   return i;
@@ -49,6 +48,25 @@ void test_map_shrink() {
 
   printf("  size: %d, capacity: %d\n", map_size_int__int(m),
          map_capacity_int__int(m));
+  assert(map_capacity_int__int(m) > 100 / MAP_MAX_LOAD);
+
+  for (int i = 0; i < 75; ++i) {
+    map_delete_int__int(m, i);
+  }
+
+  printf("  size: %d, capacity: %d\n", map_size_int__int(m),
+         map_capacity_int__int(m));
+  assert(map_capacity_int__int(m) > 25 / MAP_MAX_LOAD);
+  assert(map_capacity_int__int(m) < 100 / MAP_MAX_LOAD);
+
+  for (int i = 75; i < 90; ++i) {
+    map_delete_int__int(m, i);
+  }
+
+  printf("  size: %d, capacity: %d\n", map_size_int__int(m),
+         map_capacity_int__int(m));
+  assert(map_capacity_int__int(m) > 10 / MAP_MAX_LOAD);
+  assert(map_capacity_int__int(m) < 25 / MAP_MAX_LOAD);
 
   map_destroy_int__int(m);
 }
@@ -89,6 +107,34 @@ void test_map_get_else() {
   map_destroy_int__int(m);
 }
 
+void test_map_delete() {
+  Map_int__int* m = map_create_int__int(hash_int);
+  map_put_int__int(m, 1, 10);
+  map_put_int__int(m, 2, 20);
+  map_put_int__int(m, 3, 30);
+
+  assert(map_size_int__int(m) == 3);
+
+  assert(map_has_int__int(m, 1));
+  assert(map_delete_int__int(m, 1));
+  assert(!map_has_int__int(m, 1));
+  assert(map_size_int__int(m) == 2);
+
+  assert(map_has_int__int(m, 3));
+  assert(map_delete_int__int(m, 3));
+  assert(!map_has_int__int(m, 3));
+  assert(map_size_int__int(m) == 1);
+
+  assert(map_has_int__int(m, 2));
+  assert(map_delete_int__int(m, 2));
+  assert(!map_has_int__int(m, 2));
+  assert(map_size_int__int(m) == 0);
+
+  assert(!map_delete_int__int(m, 1));
+
+  map_destroy_int__int(m);
+}
+
 void test_map() {
   printf("test_map_put\n");
   test_map_put();
@@ -102,4 +148,8 @@ void test_map() {
   test_map_get_else();
   printf("test_map_has\n");
   test_map_has();
+  printf("test_map_delete\n");
+  test_map_delete();
 }
+
+MAP_IMPL(int, int)
