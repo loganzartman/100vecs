@@ -46,6 +46,8 @@
   extern void vec_insert_items_##T(Vec_##T* v, VEC_SIZE_T index,               \
                                    VEC_SIZE_T count, T* items);                \
   extern ITEM_TYPE(T) vec_remove_##T(Vec_##T* v, VEC_SIZE_T index);            \
+  extern void vec_qsort_##T(Vec_##T* v,                                        \
+                            int comparator(const T* a, const T* b));           \
   extern void vec_foreach_##T(Vec_##T* v, void fn(ITEM_TYPE(T), VEC_SIZE_T));
 
 #define VEC_IMPL(T)                                                            \
@@ -202,4 +204,9 @@
     for (int i = 0; i < v->size; ++i) {                                        \
       fn(vec_get_##T(v, i), i);                                                \
     }                                                                          \
+  }                                                                            \
+                                                                               \
+  void vec_qsort_##T(Vec_##T* v, int comparator(const T* a, const T* b)) {     \
+    qsort(v->data, v->size, sizeof(T),                                         \
+          (int (*)(const void*, const void*))comparator);                      \
   }

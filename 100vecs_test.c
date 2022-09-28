@@ -267,6 +267,22 @@ void test_insert_items() {
   }
 }
 
+int int_comparator(const int* a, const int* b) {
+  return (*a > *b) - (*a < *b);
+}
+
+void test_qsort() {
+  Vec_int* v = vec_create_int();
+  vec_push_int(v, 10);
+  vec_push_int(v, 30);
+  vec_push_int(v, 20);
+
+  vec_qsort_int(v, int_comparator);
+  assert(vec_get_int(v, 0) == 10);
+  assert(vec_get_int(v, 1) == 20);
+  assert(vec_get_int(v, 2) == 30);
+}
+
 extern void test_nesting();
 
 int main(int argc, char const* argv[]) {
@@ -292,6 +308,8 @@ int main(int argc, char const* argv[]) {
   test_remove();
   printf("test_insert_items\n");
   test_insert_items();
+  printf("test_qsort\n");
+  test_qsort();
   printf("test_nesting\n");
   test_nesting();
 
