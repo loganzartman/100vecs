@@ -11,20 +11,6 @@
 #define VEC_GROW_FACTOR 1.5
 #endif
 
-#if !defined(VEC_DATA_POINTERS)
-#define VEC_DATA_POINTERS 0
-#endif
-
-#if VEC_DATA_POINTERS
-#define ITEM_TYPE(T) T*
-#define ITEM_DEREF(item) (item)
-#define ITEM_REF(item) *(item)
-#else
-#define ITEM_TYPE(T) T
-#define ITEM_DEREF(item) *(item)
-#define ITEM_REF(item) (item)
-#endif
-
 #define VEC_CLEANUP(T) __attribute__((__cleanup__(vec_cleanup_##T)))
 
 #define VEC_DECL(T)                                                            \
@@ -39,17 +25,17 @@
   extern void vec_clear_##T(Vec_##T* v);                                       \
   extern void vec_grow_##T(Vec_##T* v, VEC_SIZE_T capacity);                   \
   extern void vec_compact_##T(Vec_##T* v);                                     \
-  extern ITEM_TYPE(T) vec_get_##T(Vec_##T* v, VEC_SIZE_T index);               \
-  extern void vec_set_##T(Vec_##T* v, VEC_SIZE_T index, ITEM_TYPE(T) item);    \
-  extern void vec_push_##T(Vec_##T* v, ITEM_TYPE(T) item);                     \
-  extern ITEM_TYPE(T) vec_pop_##T(Vec_##T* v);                                 \
-  extern void vec_insert_##T(Vec_##T* v, VEC_SIZE_T index, ITEM_TYPE(T) item); \
+  extern T vec_get_##T(Vec_##T* v, VEC_SIZE_T index);                          \
+  extern void vec_set_##T(Vec_##T* v, VEC_SIZE_T index, T item);               \
+  extern void vec_push_##T(Vec_##T* v, T item);                                \
+  extern T vec_pop_##T(Vec_##T* v);                                            \
+  extern void vec_insert_##T(Vec_##T* v, VEC_SIZE_T index, T item);            \
   extern void vec_insert_items_##T(Vec_##T* v, VEC_SIZE_T index,               \
                                    VEC_SIZE_T count, T* items);                \
-  extern ITEM_TYPE(T) vec_remove_##T(Vec_##T* v, VEC_SIZE_T index);            \
+  extern T vec_remove_##T(Vec_##T* v, VEC_SIZE_T index);                       \
   extern void vec_qsort_##T(Vec_##T* v,                                        \
                             int comparator(const T* a, const T* b));           \
-  extern void vec_foreach_##T(Vec_##T* v, void fn(ITEM_TYPE(T), VEC_SIZE_T));
+  extern void vec_foreach_##T(Vec_##T* v, void fn(T, VEC_SIZE_T));
 
 #define VEC_IMPL(T)                                                            \
   typedef struct Vec_##T {                                                     \
@@ -136,23 +122,23 @@
     v->capacity = v->size;                                                     \
   }                                                                            \
                                                                                \
-  ITEM_TYPE(T) vec_get_##T(Vec_##T* v, VEC_SIZE_T index) {                     \
+  T vec_get_##T(Vec_##T* v, VEC_SIZE_T index) {                                \
     assert(v);                                                                 \
     assert(index >= 0);                                                        \
     assert(index < v->size);                                                   \
                                                                                \
-    return ITEM_DEREF(v->data + index);                                        \
+    return v->data[index];                                                     \
   }                                                                            \
                                                                                \
-  void vec_set_##T(Vec_##T* v, VEC_SIZE_T index, ITEM_TYPE(T) item) {          \
+  void vec_set_##T(Vec_##T* v, VEC_SIZE_T index, T item) {                     \
     assert(v);                                                                 \
     assert(index >= 0);                                                        \
     assert(index < v->size);                                                   \
                                                                                \
-    v->data[index] = ITEM_REF(item);                                           \
+    v->data[index] = item;                                                     \
   }                                                                            \
                                                                                \
-  void vec_push_##T(Vec_##T* v, ITEM_TYPE(T) item) {                           \
+  void vec_push_##T(Vec_##T* v, T item) {                                      \
     assert(v);                                                                 \
                                                                                \
     vec_grow_##T(v, v->size + 1);                                              \
@@ -160,16 +146,16 @@
     vec_set_##T(v, v->size - 1, item);                                         \
   }                                                                            \
                                                                                \
-  ITEM_TYPE(T) vec_pop_##T(Vec_##T* v) {                                       \
+  T vec_pop_##T(Vec_##T* v) {                                                  \
     assert(v);                                                                 \
     assert(v->size > 0);                                                       \
                                                                                \
-    ITEM_TYPE(T) result = vec_get_##T(v, v->size - 1);                         \
+    T result = vec_get_##T(v, v->size - 1);                                    \
     v->size -= 1;                                                              \
     return result;                                                             \
   }                                                                            \
                                                                                \
-  void vec_insert_##T(Vec_##T* v, VEC_SIZE_T index, ITEM_TYPE(T) item) {       \
+  void vec_insert_##T(Vec_##T* v, VEC_SIZE_T index, T item) {                  \
     assert(v);                                                                 \
     assert(index >= 0);                                                        \
     assert(index <= v->size);                                                  \
@@ -198,12 +184,12 @@
     }                                                                          \
   }                                                                            \
                                                                                \
-  ITEM_TYPE(T) vec_remove_##T(Vec_##T* v, VEC_SIZE_T index) {                  \
+  T vec_remove_##T(Vec_##T* v, VEC_SIZE_T index) {                             \
     assert(v);                                                                 \
     assert(index >= 0);                                                        \
     assert(index < v->size);                                                   \
                                                                                \
-    ITEM_TYPE(T) item = vec_get_##T(v, index);                                 \
+    T item = vec_get_##T(v, index);                                            \
     for (VEC_SIZE_T i = index; i < v->size - 1; ++i) {                         \
       vec_set_##T(v, i, vec_get_##T(v, i + 1));                                \
     }                                                                          \
@@ -211,7 +197,7 @@
     return item;                                                               \
   }                                                                            \
                                                                                \
-  void vec_foreach_##T(Vec_##T* v, void fn(ITEM_TYPE(T), VEC_SIZE_T)) {        \
+  void vec_foreach_##T(Vec_##T* v, void fn(T, VEC_SIZE_T)) {                   \
     for (int i = 0; i < v->size; ++i) {                                        \
       fn(vec_get_##T(v, i), i);                                                \
     }                                                                          \
