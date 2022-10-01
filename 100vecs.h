@@ -331,9 +331,11 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
                                                                                \
   void map_put_unsafe_##K##__##V(Map_##K##__##V* m,                            \
                                  MapEntry_##K##__##V entry) {                  \
+    assert(m->capacity > 0);                                                   \
     int i0 = m->hash(entry.key) % m->capacity;                                 \
     int i = i0;                                                                \
-    while (m->data_status[i] == MAP_STATUS_PRESENT) {                          \
+    while (m->data_status[i] == MAP_STATUS_PRESENT &&                          \
+           !m->eq(m->data[i].key, entry.key)) {                                \
       i = (i + 1) % m->capacity;                                               \
       assert(i != i0);                                                         \
     }                                                                          \

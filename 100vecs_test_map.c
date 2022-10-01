@@ -132,6 +132,20 @@ void test_map_delete() {
   map_destroy_int__int(m);
 }
 
+void test_map_overwrite() {
+  Map_int__int* m = map_create_int__int(hash_int, eq_int);
+  map_put_int__int(m, 1, 10);
+  map_put_int__int(m, 2, 20);
+  assert(map_has_int__int(m, 1));
+  assert(*map_get_int__int(m, 1) == 10);
+
+  map_put_int__int(m, 1, 100);
+  assert(map_has_int__int(m, 1));
+  assert(*map_get_int__int(m, 1) == 100);
+
+  map_destroy_int__int(m);
+}
+
 int dummy_hash(int i) {
   if (i < 5)
     return 0;
@@ -199,6 +213,8 @@ void test_map() {
   test_map_has();
   printf("test_map_delete\n");
   test_map_delete();
+  printf("test_map_overwrite\n");
+  test_map_overwrite();
   printf("test_map_collisions\n");
   test_map_collisions();
 }
