@@ -1,3 +1,4 @@
+#pragma once
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -236,6 +237,7 @@
 #define MAP_DECL(K, V)                                                         \
   typedef struct MapEntry_##K##__##V MapEntry_##K##__##V;                      \
   typedef struct Map_##K##__##V Map_##K##__##V;                                \
+  extern void map_debug_##K##__##V(Map_##K##__##V* m);                         \
   extern VEC_SIZE_T map_size_##K##__##V(Map_##K##__##V* m);                    \
   extern VEC_SIZE_T map_capacity_##K##__##V(Map_##K##__##V* m);                \
   extern MapEntry_##K##__##V* map_data_##K##__##V(Map_##K##__##V* m);          \
@@ -265,6 +267,15 @@
     MapEntry_##K##__##V* data;                                                 \
     bool* data_present;                                                        \
   } Map_##K##__##V;                                                            \
+                                                                               \
+  void map_debug_##K##__##V(Map_##K##__##V* m) {                               \
+    printf("Map [\n");                                                         \
+    for (int i = 0; i < m->capacity; ++i) {                                    \
+      printf("  %d (%d): (%p, %p),\n", i, m->data_present[i], m->data[i].key,  \
+             m->data[i].value);                                                \
+    }                                                                          \
+    printf("]\n");                                                             \
+  }                                                                            \
                                                                                \
   VEC_SIZE_T map_size_##K##__##V(Map_##K##__##V* m) {                          \
     return m->size;                                                            \
