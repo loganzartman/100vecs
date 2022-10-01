@@ -25,10 +25,12 @@ void test_create() {
   Vec_int* vi = vec_create_int();
   assert(vi);
   assert(&*(char*)vi);
+  vec_destroy_int(vi);
 
   Vec_Point* vp = vec_create_Point();
   assert(vp);
   assert(&*(char*)vp);
+  vec_destroy_Point(vp);
 }
 
 void test_destroy() {
@@ -289,6 +291,8 @@ void test_qsort() {
   assert(vec_get_int(v, 0) == 10);
   assert(vec_get_int(v, 1) == 20);
   assert(vec_get_int(v, 2) == 30);
+
+  vec_destroy_int(v);
 }
 
 extern void test_nesting();

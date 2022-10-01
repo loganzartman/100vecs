@@ -64,6 +64,8 @@ void test_map_shrink() {
   printf("  size: %d, capacity: %d\n", map_size_int__int(m),
          map_capacity_int__int(m));
   assert(map_capacity_int__int(m) == expected_capacity);
+
+  map_destroy_int__int(m);
 }
 
 void test_map_get() {

@@ -322,6 +322,10 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
       free(m->data);                                                           \
       m->data = NULL;                                                          \
     }                                                                          \
+    if (m->data_status) {                                                      \
+      free(m->data_status);                                                    \
+      m->data_status = NULL;                                                   \
+    }                                                                          \
     free(m);                                                                   \
   }                                                                            \
                                                                                \
