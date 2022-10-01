@@ -224,6 +224,18 @@
 //                         888
 //                         888
 
+// FNV-1a hash
+#define FNV_OFFSET_BASIS 0xcbf29ce484222325
+#define FNV_PRIME 0x100000001b3
+static uint64_t hash_bytes(void* bytes, uint32_t len) {
+  uint64_t hash = FNV_OFFSET_BASIS;
+  for (uint32_t i = 0; i < len; ++i) {
+    hash ^= *((uint8_t*)(bytes + i));
+    hash *= FNV_PRIME;
+  }
+  return hash;
+}
+
 #if !defined(MAP_MAX_LOAD)
 #define MAP_MAX_LOAD 0.6
 #endif
@@ -271,7 +283,7 @@
   void map_debug_##K##__##V(Map_##K##__##V* m) {                               \
     printf("Map [\n");                                                         \
     for (int i = 0; i < m->capacity; ++i) {                                    \
-      printf("  %d (%d): (%p, %p),\n", i, m->data_present[i], m->data[i].key,  \
+      printf("  %d (%d): (%x, %x),\n", i, m->data_present[i], m->data[i].key,  \
              m->data[i].value);                                                \
     }                                                                          \
     printf("]\n");                                                             \
@@ -311,8 +323,7 @@
                                                                                \
   void map_put_unsafe_##K##__##V(Map_##K##__##V* m,                            \
                                  MapEntry_##K##__##V entry) {                  \
-    int h = m->hash(entry.key);                                                \
-    int i0 = h % m->capacity;                                                  \
+    int i0 = m->hash(entry.key) % m->capacity;                                 \
     int i = i0;                                                                \
     while (m->data_present[i]) {                                               \
       i = (i + 1) % m->capacity;                                               \
@@ -358,8 +369,7 @@
   }                                                                            \
                                                                                \
   V* map_get_##K##__##V(Map_##K##__##V* m, K key) {                            \
-    int h = m->hash(key);                                                      \
-    int i0 = h % m->capacity;                                                  \
+    int i0 = m->hash(key) % m->capacity;                                       \
     int i = i0;                                                                \
     while (m->data_present[i]) {                                               \
       if (m->eq(m->data[i].key, key)) {                                        \
@@ -390,8 +400,7 @@
   }                                                                            \
                                                                                \
   bool map_delete_##K##__##V(Map_##K##__##V* m, K key) {                       \
-    int h = m->hash(key);                                                      \
-    int i0 = h % m->capacity;                                                  \
+    int i0 = m->hash(key) % m->capacity;                                       \
     int i = i0;                                                                \
     while (m->data_present[i]) {                                               \
       if (m->eq(m->data[i].key, key)) {                                        \
