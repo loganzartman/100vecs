@@ -16,6 +16,9 @@ test: 100vecs_test
 100vecs_test: 100vecs.h 100vecs_test.c 100vecs_test_nesting.c 100vecs_test_map.c
 	$(CC) $(CFLAGS) 100vecs_test.c 100vecs_test_nesting.c 100vecs_test_map.c -o 100vecs_test
 
+fuzzer_gen: 100vecs.h fuzzer_gen.c
+	$(CC) $(CFLAGS) fuzzer_gen.c -o fuzzer_gen
+
 function_list.md: 100vecs.h make_function_list.sh
 	printf '#include "100vecs.h"\nVEC_DECL(T)\nMAP_DECL(K,V)' > function_list.c
 	$(CC) $(CFLAGS) -E function_list.c -o function_list.txt

@@ -1,4 +1,7 @@
 100vecs_test.exe
 100vecs_test
+fuzzer_gen.exe
+fuzzer_gen
+fuzzer_gen.c
 *.o
 
