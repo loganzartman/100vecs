@@ -49,30 +49,21 @@ void test_map_shrink() {
   for (int i = 0; i < 100; ++i) {
     map_put_int__int(m, i, i * 10);
   }
-
   printf("  size: %d, capacity: %d\n", map_size_int__int(m),
          map_capacity_int__int(m));
-  assert(map_capacity_int__int(m) > 100 / MAP_MAX_LOAD);
 
-  for (int i = 0; i < 75; ++i) {
+  int size_to_shrink = (int)(MAP_MIN_LOAD * map_capacity_int__int(m));
+  int n_to_delete = 100 - size_to_shrink;
+  assert(n_to_delete > 0);
+  int expected_capacity = (int)(MAP_SHRINK_FACTOR * map_capacity_int__int(m));
+
+  for (int i = 0; i < n_to_delete; ++i) {
     map_delete_int__int(m, i);
   }
 
   printf("  size: %d, capacity: %d\n", map_size_int__int(m),
          map_capacity_int__int(m));
-  assert(map_capacity_int__int(m) > 25 / MAP_MAX_LOAD);
-  assert(map_capacity_int__int(m) < 100 / MAP_MAX_LOAD);
-
-  for (int i = 75; i < 90; ++i) {
-    map_delete_int__int(m, i);
-  }
-
-  printf("  size: %d, capacity: %d\n", map_size_int__int(m),
-         map_capacity_int__int(m));
-  assert(map_capacity_int__int(m) > 10 / MAP_MAX_LOAD);
-  assert(map_capacity_int__int(m) < 25 / MAP_MAX_LOAD);
-
-  map_destroy_int__int(m);
+  assert(map_capacity_int__int(m) == expected_capacity);
 }
 
 void test_map_get() {
