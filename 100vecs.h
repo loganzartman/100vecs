@@ -342,7 +342,7 @@
       }                                                                        \
     } else {                                                                   \
       m->capacity = MAP_DEFAULT_CAPACITY;                                      \
-      m->data = malloc(m->capacity * sizeof(V));                               \
+      m->data = calloc(m->capacity, sizeof(MapEntry_##K##__##V));              \
       m->data_present = calloc(m->capacity, sizeof(bool));                     \
     }                                                                          \
   }                                                                            \
