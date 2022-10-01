@@ -347,7 +347,8 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
   void map_resize_##K##__##V(Map_##K##__##V* m) {                              \
     if (m->data) {                                                             \
       float load = (float)m->size / m->capacity;                               \
-      if (load > MAP_MAX_LOAD || load < MAP_MIN_LOAD) {                        \
+      if (load > MAP_MAX_LOAD ||                                               \
+          (load < MAP_MIN_LOAD && m->capacity > MAP_DEFAULT_CAPACITY)) {       \
         VEC_SIZE_T old_capacity = m->capacity;                                 \
         MapEntry_##K##__##V* old_data = m->data;                               \
         uint8_t* old_data_status = m->data_status;                             \
