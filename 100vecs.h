@@ -223,10 +223,6 @@
 //                         888
 //                         888
 
-#if !defined(MAP_DEFAULT_CAPACITY)
-#define MAP_DEFAULT_CAPACITY 10
-#endif
-
 #if !defined(MAP_MAX_LOAD)
 #define MAP_MAX_LOAD 0.6
 #endif
@@ -234,6 +230,8 @@
 #define MAP_MIN_LOAD (MAP_MAX_LOAD * 0.25)
 #define MAP_GROW_FACTOR 2.0
 #define MAP_SHRINK_FACTOR 0.5
+#define MAP_DEFAULT_CAPACITY                                                   \
+  ((int)(0.5 + 1.0 / ((MAP_MAX_LOAD + MAP_MIN_LOAD) * 0.5)))
 
 #define MAP_DECL(K, V)                                                         \
   typedef struct MapEntry_##K##__##V MapEntry_##K##__##V;                      \
@@ -288,6 +286,7 @@
     m->hash = hash;                                                            \
     m->eq = eq;                                                                \
     m->data = NULL;                                                            \
+    m->data_present = NULL;                                                    \
     return m;                                                                  \
   }                                                                            \
                                                                                \
@@ -328,7 +327,7 @@
         }                                                                      \
                                                                                \
         m->size = 0;                                                           \
-        m->data = malloc(m->capacity * sizeof(MapEntry_##K##__##V));           \
+        m->data = calloc(m->capacity, sizeof(MapEntry_##K##__##V));            \
         m->data_present = calloc(m->capacity, sizeof(bool));                   \
                                                                                \
         for (int i = 0; i < old_capacity; ++i) {                               \
