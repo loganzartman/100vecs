@@ -246,6 +246,10 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
 #define MAP_DEFAULT_CAPACITY                                                   \
   ((int)(0.5 + 1.0 / ((MAP_MAX_LOAD + MAP_MIN_LOAD) * 0.5)))
 
+#define MAP_STATUS_EMPTY 0
+#define MAP_STATUS_PRESENT 1
+#define MAP_STATUS_DELETED 2
+
 #define MAP_DECL(K, V)                                                         \
   typedef struct MapEntry_##K##__##V MapEntry_##K##__##V;                      \
   typedef struct Map_##K##__##V Map_##K##__##V;                                \
@@ -277,13 +281,13 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
     int (*hash)(K key);                                                        \
     bool (*eq)(K a, K b);                                                      \
     MapEntry_##K##__##V* data;                                                 \
-    bool* data_present;                                                        \
+    uint8_t* data_status;                                                      \
   } Map_##K##__##V;                                                            \
                                                                                \
   void map_debug_##K##__##V(Map_##K##__##V* m) {                               \
     printf("Map [\n");                                                         \
     for (int i = 0; i < m->capacity; ++i) {                                    \
-      printf("  %d (%d): (%x, %x),\n", i, m->data_present[i], m->data[i].key,  \
+      printf("  %d (%d): (%x, %x),\n", i, m->data_status[i], m->data[i].key,   \
              m->data[i].value);                                                \
     }                                                                          \
     printf("]\n");                                                             \
@@ -309,7 +313,7 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
     m->hash = hash;                                                            \
     m->eq = eq;                                                                \
     m->data = NULL;                                                            \
-    m->data_present = NULL;                                                    \
+    m->data_status = NULL;                                                     \
     return m;                                                                  \
   }                                                                            \
                                                                                \
@@ -325,12 +329,12 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
                                  MapEntry_##K##__##V entry) {                  \
     int i0 = m->hash(entry.key) % m->capacity;                                 \
     int i = i0;                                                                \
-    while (m->data_present[i]) {                                               \
+    while (m->data_status[i] == MAP_STATUS_PRESENT) {                          \
       i = (i + 1) % m->capacity;                                               \
       assert(i != i0);                                                         \
     }                                                                          \
     m->data[i] = entry;                                                        \
-    m->data_present[i] = true;                                                 \
+    m->data_status[i] = MAP_STATUS_PRESENT;                                    \
     m->size += 1;                                                              \
   }                                                                            \
                                                                                \
@@ -340,7 +344,7 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
       if (load > MAP_MAX_LOAD || load < MAP_MIN_LOAD) {                        \
         VEC_SIZE_T old_capacity = m->capacity;                                 \
         MapEntry_##K##__##V* old_data = m->data;                               \
-        bool* old_data_present = m->data_present;                              \
+        uint8_t* old_data_status = m->data_status;                             \
                                                                                \
         if (load > MAP_MAX_LOAD) {                                             \
           m->capacity = (VEC_SIZE_T)(m->capacity * MAP_GROW_FACTOR);           \
@@ -350,29 +354,30 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
                                                                                \
         m->size = 0;                                                           \
         m->data = calloc(m->capacity, sizeof(MapEntry_##K##__##V));            \
-        m->data_present = calloc(m->capacity, sizeof(bool));                   \
+        m->data_status = calloc(m->capacity, sizeof(bool));                    \
                                                                                \
         for (int i = 0; i < old_capacity; ++i) {                               \
-          if (old_data_present[i]) {                                           \
+          if (old_data_status[i] == MAP_STATUS_PRESENT) {                      \
             map_put_unsafe_##K##__##V(m, old_data[i]);                         \
           }                                                                    \
         }                                                                      \
                                                                                \
         free(old_data);                                                        \
-        free(old_data_present);                                                \
+        free(old_data_status);                                                 \
       }                                                                        \
     } else {                                                                   \
       m->capacity = MAP_DEFAULT_CAPACITY;                                      \
       m->data = calloc(m->capacity, sizeof(MapEntry_##K##__##V));              \
-      m->data_present = calloc(m->capacity, sizeof(bool));                     \
+      m->data_status = calloc(m->capacity, sizeof(bool));                      \
     }                                                                          \
   }                                                                            \
                                                                                \
   V* map_get_##K##__##V(Map_##K##__##V* m, K key) {                            \
     int i0 = m->hash(key) % m->capacity;                                       \
     int i = i0;                                                                \
-    while (m->data_present[i]) {                                               \
-      if (m->eq(m->data[i].key, key)) {                                        \
+    while (m->data_status[i] != MAP_STATUS_EMPTY) {                            \
+      if (m->data_status[i] == MAP_STATUS_PRESENT &&                           \
+          m->eq(m->data[i].key, key)) {                                        \
         return &m->data[i].value;                                              \
       }                                                                        \
       i = (i + 1) % m->capacity;                                               \
@@ -402,9 +407,10 @@ static uint64_t hash_bytes(void* bytes, uint32_t len) {
   bool map_delete_##K##__##V(Map_##K##__##V* m, K key) {                       \
     int i0 = m->hash(key) % m->capacity;                                       \
     int i = i0;                                                                \
-    while (m->data_present[i]) {                                               \
-      if (m->eq(m->data[i].key, key)) {                                        \
-        m->data_present[i] = false;                                            \
+    while (m->data_status[i] != MAP_STATUS_EMPTY) {                            \
+      if (m->data_status[i] == MAP_STATUS_PRESENT &&                           \
+          m->eq(m->data[i].key, key)) {                                        \
+        m->data_status[i] = MAP_STATUS_DELETED;                                \
         m->size -= 1;                                                          \
         map_resize_##K##__##V(m);                                              \
         return true;                                                           \
