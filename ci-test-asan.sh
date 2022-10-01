@@ -1,0 +1,1 @@
+make clean && CFLAGS="-fsanitize=address -O1 -fno-omit-frame-pointer" make test

@@ -24,4 +24,11 @@ jobs:
         run: sudo apt-get install build-essential
 
       - name: Run tests
-        run: make test
+        run: |
+          chmod +x ./ci-test.sh
+          ./ci-test.sh
+
+      - name: Address sanitizer tests
+        run: |
+          chmod +x ./ci-test-asan.sh
+          ./ci-test-asan.sh
